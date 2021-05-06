@@ -1,5 +1,23 @@
 from django.shortcuts import render, HttpResponse
 from user.models import User
+from django.views.generic import View, ListView, FormView, DetailView
+from django.urls import reverse_lazy
+from user.forms import UserForm
+
+
+class AddUserView(FormView):
+
+    form_class = UserForm
+    template_name = 'user.html'
+    success_url = reverse_lazy('user-list')
+
+    def form_valid(self, form):
+        form.save()
+
+        response = super().form_valid(form)
+        return response
+
+
 
 
 def index(request):
@@ -16,33 +34,6 @@ def index(request):
         context=context,
     )
 
-
-def add_user(request):
-
-    if request.method == 'POST':
-
-        user = User(
-            username=request.POST['name'],
-            email=request.POST['email'],
-        )
-
-        user.save()
-
-        context = {
-            'user': user,
-        }
-
-        return render(
-            template_name='user.html',
-            request=request,
-            context=context,
-
-        )
-
-    return render(
-        template_name='form.html',
-        request=request
-    )
 
 
 def get_user(request, user_id):
